@@ -3,10 +3,12 @@ import { SITE_URL, SUPPORTED_LOCALES } from '@/lib/constants';
 
 const localeRoutes = ['', '/about', '/services', '/portfolio', '/contact', '/faq', '/quote'];
 
+type SitemapEntry = MetadataRoute.Sitemap[number];
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  const localizedEntries = SUPPORTED_LOCALES.flatMap((locale) =>
+  const localizedEntries: SitemapEntry[] = SUPPORTED_LOCALES.flatMap((locale) =>
     localeRoutes.map((route) => ({
       url: `${SITE_URL}/${locale}${route}`,
       lastModified: now,

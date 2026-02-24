@@ -1,7 +1,4 @@
-import Script from 'next/script';
-
-const initThemeScript = `
-(function () {
+const initThemeScript = `(function(){
   try {
     var stored = localStorage.getItem('theme');
     var preferredDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -12,9 +9,8 @@ const initThemeScript = `
     document.documentElement.classList.toggle('dark', false);
     document.documentElement.style.colorScheme = 'light';
   }
-})();
-`;
+})();`;
 
 export function ThemeInitScript() {
-  return <Script id="theme-init" strategy="beforeInteractive">{initThemeScript}</Script>;
+  return <script>{initThemeScript}</script>;
 }
