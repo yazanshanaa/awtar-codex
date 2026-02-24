@@ -10,14 +10,6 @@
   --color-gold: #b6892d;
 }
 
-.dark {
-  --color-bg: #0f1115;
-  --color-fg: #eceef3;
-  --color-surface: #181c24;
-  --color-border: #2a3040;
-  --color-gold: #d6a94a;
-}
-
 body {
   background: var(--color-bg);
   color: var(--color-fg);

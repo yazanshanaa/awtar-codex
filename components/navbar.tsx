@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { type Locale } from '@/lib/constants';
 import { t } from '@/lib/i18n';
@@ -26,7 +25,6 @@ export function Navbar({ locale }: { locale: Locale }) {
 
         <div className={`flex items-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
           <LanguageSwitcher activeLocale={locale} />
-          <ThemeToggle />
         </div>
       </div>
     </header>
