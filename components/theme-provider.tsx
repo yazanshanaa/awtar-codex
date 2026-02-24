@@ -16,29 +16,39 @@ function applyTheme(theme: Theme) {
   document.documentElement.style.colorScheme = theme;
 }
 
-function readStoredTheme(): Theme | null {
-  const value = window.localStorage.getItem('theme');
-  return value === 'dark' || value === 'light' ? value : null;
+function getInitialTheme(): Theme {
+  const stored = window.localStorage.getItem('theme');
+  if (stored === 'dark' || stored === 'light') return stored;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('light');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const stored = readStoredTheme();
-    const preferredDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initial: Theme = stored ?? (preferredDark ? 'dark' : 'light');
-    applyTheme(initial);
+    const initial = getInitialTheme();
     setTheme(initial);
+    setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    applyTheme(theme);
+    try {
+      window.localStorage.setItem('theme', theme);
+    } catch {
+      // Ignore storage failures.
+    }
+  }, [mounted, theme]);
 
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
       if (event.key !== 'theme') return;
-      const next = event.newValue === 'dark' || event.newValue === 'light' ? event.newValue : null;
-      if (!next) return;
-      setTheme(next);
-      applyTheme(next);
+      const next = event.newValue;
+      if (next === 'dark' || next === 'light') {
+        setTheme(next);
+      }
     };
 
     window.addEventListener('storage', onStorage);
@@ -49,16 +59,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     () => ({
       theme,
       toggleTheme: () => {
-        setTheme((current) => {
-          const next: Theme = current === 'dark' ? 'light' : 'dark';
-          applyTheme(next);
-          try {
-            window.localStorage.setItem('theme', next);
-          } catch {
-            // Ignore write failures in restricted environments.
-          }
-          return next;
-        });
+        setTheme((current) => (current === 'dark' ? 'light' : 'dark'));
       }
     }),
     [theme]
@@ -69,8 +70,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 export function useTheme() {
   const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used inside ThemeProvider');
-  }
+  if (!context) throw new Error('useTheme must be used inside ThemeProvider');
   return context;
 }
