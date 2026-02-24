@@ -3,7 +3,13 @@
 import { useTheme } from '@/components/theme-provider';
 
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, mounted } = useTheme();
+
+  if (!mounted) {
+    return (
+      <div className="h-10 w-10 animate-pulse rounded-full bg-surface" aria-hidden="true" />
+    );
+  }
 
   return (
     <button
