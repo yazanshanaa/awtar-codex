@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: 248 247 244;
+  --color-fg: 26 26 26;
+  --color-surface: 239 238 235;
+  --color-border: 216 213 206;
+  --color-gold: 138 92 0;
+}
+
+.dark {
+  --color-bg: 15 17 21;
+  --color-fg: 236 238 243;
+  --color-surface: 24 28 36;
+  --color-border: 42 48 64;
+  --color-gold: 214 169 74;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  background-color: rgb(var(--color-bg));
+  color: rgb(var(--color-fg));
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+html {
+  scroll-behavior: smooth;
+}
