@@ -12,11 +12,12 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function applyTheme(theme: Theme) {
-  document.documentElement.classList.toggle('dark', theme === 'dark');
-  document.documentElement.style.colorScheme = theme;
+  const root = document.documentElement;
+  root.classList.toggle('dark', theme === 'dark');
+  root.style.colorScheme = theme;
 }
 
-function getInitialTheme(): Theme {
+function detectInitialTheme(): Theme {
   const stored = window.localStorage.getItem('theme');
   if (stored === 'dark' || stored === 'light') return stored;
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -27,8 +28,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const initial = getInitialTheme();
+    const initial = detectInitialTheme();
     setTheme(initial);
+    applyTheme(initial);
     setMounted(true);
   }, []);
 
@@ -43,16 +45,31 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [mounted, theme]);
 
   useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const onMediaChange = () => {
+      const stored = window.localStorage.getItem('theme');
+      if (stored === 'dark' || stored === 'light') return;
+      const next: Theme = media.matches ? 'dark' : 'light';
+      setTheme(next);
+      applyTheme(next);
+    };
+
     const onStorage = (event: StorageEvent) => {
       if (event.key !== 'theme') return;
       const next = event.newValue;
       if (next === 'dark' || next === 'light') {
         setTheme(next);
+        applyTheme(next);
       }
     };
 
+    media.addEventListener('change', onMediaChange);
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+
+    return () => {
+      media.removeEventListener('change', onMediaChange);
+      window.removeEventListener('storage', onStorage);
+    };
   }, []);
 
   const value = useMemo(
